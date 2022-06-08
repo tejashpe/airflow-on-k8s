@@ -14,7 +14,7 @@ from airflow.operators.python import PythonOperator
 
 # [START instantiate_dag]
 with DAG(
-    'custom_etl_withxcode',
+    'ingest_mnist_data',
     default_args={'retries': 2},
     description='ETL DAG with lineage',
     schedule_interval=None,
@@ -29,13 +29,23 @@ with DAG(
 
     # [START extract_function]
     def extract(**kwargs):
+        import os
         print("Extracting the data")
+        rootdir = '/'
+        for it in os.scandir(rootdir):
+            if it.is_dir():
+                print(it.path)
 
     # [END extract_function]
 
     # [START transform_function]
     def transform(**kwargs):
         print("Transforming the data")
+        import os
+        rootdir = '/bd-fs-mnt'
+        for it in os.scandir(rootdir):
+            if it.is_dir():
+                print(it.path)
 
     # [END transform_function]
 
