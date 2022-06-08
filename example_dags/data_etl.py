@@ -60,7 +60,7 @@ with DAG(
 
         s3_client = boto3.client('s3', endpoint_url=Variable.get('S3_ENDPOINT'), 
             aws_access_key_id= Variable.get('AWS_ACCESS_KEY_ID'), aws_secret_access_key=Variable.get('AWS_SECRET_ACCESS_KEY'), verify=False)
-        response = s3_client.upload_file(f'{filename}_extract/adult_data.csv', 'data', "data/{}".format('adult.csv'))
+        response = s3_client.upload_file(f'{filename}_extract/adult_data.csv', 'data', "data/{}".format('adult_data.csv'))
         print("Uploaded data to S3", response)
         response = s3_client.upload_file(f'{filename}_extract/adult_test.csv', 'data', "data/{}".format('adult_test.csv'))
         print("Uploaded test data to S3", response)
