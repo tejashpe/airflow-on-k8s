@@ -32,9 +32,8 @@ with DAG(
     # [START extract_function]
     def extract(**kwargs):
         import os
-        print(os.environ["S3_ENDPOINT"])
         import boto3
-        s3_client = boto3.client('s3', endpoint_url=os.environ["S3_ENDPOINT"])
+        s3_client = boto3.client('s3', endpoint_url="https://gl-cp-str-node1.gl-hpe.local:9000", verify=False)
         response = s3_client.list_buckets()
         print(response)
 
