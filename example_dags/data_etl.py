@@ -35,9 +35,29 @@ with DAG(
         import os
         import boto3
         from airflow.models import Variable
+        import requests
+
+        print('Downloading started')
+        url = Variable.get('DATA_SOURCE')
+
+        # Downloading the file by sending the request to the URL
+        req = requests.get(url)
+        
+        # Split URL to get the file name
+        filename = url.split('/')[-1]
+        
+        # Writing the file to the local file system
+        with open(filename,'wb') as output_file:
+            output_file.write(req.content)
+        
+        import zipfile
+        with zipfile.ZipFile(filename, 'r') as zip_ref: 
+            zip_ref.extractall(filename+"_extract")
+        print('Downloading Completed')
+
         s3_client = boto3.client('s3', endpoint_url=Variable.get('S3_ENDPOINT'), 
             aws_access_key_id= Variable.get('AWS_ACCESS_KEY_ID'), aws_secret_access_key=Variable.get('AWS_SECRET_ACCESS_KEY'), verify=False)
-        response = s3_client.list_buckets()
+        response = s3_client.upload_file(f'{filename}_extract/adult_data.csv', 'data', "data/{}".format('adult.csv'))
         print(response)
 
     # [END extract_function]
@@ -46,7 +66,7 @@ with DAG(
     def transform(**kwargs):
         print("Transforming the data")
         import os
-        rootdir = '/'
+        rootdir = '.'
         for it in os.scandir(rootdir):
             if it.is_dir():
                 print(it.path)
