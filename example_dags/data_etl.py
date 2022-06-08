@@ -14,7 +14,7 @@ from airflow.operators.python import PythonOperator
 
 # [START instantiate_dag]
 with DAG(
-    'custom_etl_withxcode)',
+    'custom_etl_withxcode',
     default_args={'retries': 2},
     description='ETL DAG with lineage',
     schedule_interval=None,
