@@ -6,9 +6,11 @@ from airflow import DAG
 import pendulum
 import pandas as pd
 import numpy as np
+import boto3
 
 # Operators; we need this to operate!
 from airflow.operators.python import PythonOperator
+
 
 # [END import_module]
 
@@ -30,11 +32,11 @@ with DAG(
     # [START extract_function]
     def extract(**kwargs):
         import os
-        print("Extracting the data")
-        rootdir = '/'
-        for it in os.scandir(rootdir):
-            if it.is_dir():
-                print(it.path)
+        print(os.environ["S3_ENDPOINT"])
+        import boto3
+        s3_client = boto3.client('s3', endpoint_url=os.environ["S3_ENDPOINT"])
+        response = s3_client.list_buckets()
+        print(response)
 
     # [END extract_function]
 
@@ -42,7 +44,7 @@ with DAG(
     def transform(**kwargs):
         print("Transforming the data")
         import os
-        rootdir = '/bd-fs-mnt'
+        rootdir = '/'
         for it in os.scandir(rootdir):
             if it.is_dir():
                 print(it.path)
