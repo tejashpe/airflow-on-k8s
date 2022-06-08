@@ -37,6 +37,9 @@ with DAG(
         from airflow.models import Variable
         import requests
 
+        os.environ['HTTP_PROXY']=Variable.get('PROXY')
+        os.environ['HTTPS_PROXY']=Variable.get('PROXY')
+        os.environ['NO_PROXY']=Variable.get('NO_PROXY')
         print('Downloading started')
         url = Variable.get('DATA_SOURCE')
 
