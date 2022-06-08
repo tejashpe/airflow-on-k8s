@@ -17,7 +17,7 @@ from airflow.models import Variable
 
 # [START instantiate_dag]
 with DAG(
-    'custom_etl_withxcode',
+    'income_prediction_data_etl',
     default_args={'retries': 2},
     description='ETL DAG with lineage',
     schedule_interval=None,
@@ -94,6 +94,7 @@ with DAG(
     # [START load_function]
     def load(**kwargs):
         print("S3 has latest cleaned data to be used")
+        print("Extract metadata- : TDFV and Quality indicators")
         print("Notify KF Pipeline")
     # [END load_function]
 
