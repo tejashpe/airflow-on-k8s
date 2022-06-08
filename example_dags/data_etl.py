@@ -10,6 +10,7 @@ import boto3
 
 # Operators; we need this to operate!
 from airflow.operators.python import PythonOperator
+from airflow.models import Variable
 
 
 # [END import_module]
@@ -33,7 +34,9 @@ with DAG(
     def extract(**kwargs):
         import os
         import boto3
-        s3_client = boto3.client('s3', endpoint_url="https://gl-cp-str-node1.gl-hpe.local:9000", verify=False)
+        from airflow.models import Variable
+        s3_client = boto3.client('s3', endpoint_url=Variable.get('S3_ENDPOINT'), 
+            aws_access_key_id= Variable.get('AWS_ACCESS_KEY_ID'), aws_secret_access_key=Variable.get('AWS_SECRET_ACCESS_KEY'), verify=False)
         response = s3_client.list_buckets()
         print(response)
 
