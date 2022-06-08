@@ -60,9 +60,9 @@ with DAG(
 
         s3_client = boto3.client('s3', endpoint_url=Variable.get('S3_ENDPOINT'), 
             aws_access_key_id= Variable.get('AWS_ACCESS_KEY_ID'), aws_secret_access_key=Variable.get('AWS_SECRET_ACCESS_KEY'), verify=False)
-        response = s3_client.upload_file(f'{filename}_extract/adult_data.csv', 'data', "data/{}".format('adult_data.csv'))
+        response = s3_client.upload_file(f'{filename}_extract/income_data.csv', 'data', "data/{}".format('income_data.csv'))
         print("Uploaded data to S3", response)
-        response = s3_client.upload_file(f'{filename}_extract/adult_test.csv', 'data', "data/{}".format('adult_test.csv'))
+        response = s3_client.upload_file(f'{filename}_extract/income_test.csv', 'data', "data/{}".format('income_test.csv'))
         print("Uploaded test data to S3", response)
     # [END extract_function]
 
@@ -75,19 +75,19 @@ with DAG(
         import pandas as pd
         s3_client = boto3.client('s3', endpoint_url=Variable.get('S3_ENDPOINT'), 
             aws_access_key_id= Variable.get('AWS_ACCESS_KEY_ID'), aws_secret_access_key=Variable.get('AWS_SECRET_ACCESS_KEY'), verify=False)
-        s3_client.download_file('data', "data/{}".format('adult_data.csv'), 'adult_data.csv')
-        s3_client.download_file('data', "data/{}".format('adult_test.csv'), 'adult_test.csv')
-        train_set = pd.read_csv('adult_data.csv', header=None)
+        s3_client.download_file('data', "data/{}".format('income_data.csv'), 'income_data.csv')
+        s3_client.download_file('data', "data/{}".format('income_test.csv'), 'income_test.csv')
+        train_set = pd.read_csv('income_data.csv', header=None)
         train_set.head()
-        test_set = pd.read_csv('adult_test.csv', skiprows=1, header=None)
+        test_set = pd.read_csv('income_test.csv', skiprows=1, header=None)
         test_set.head()
         train_no_missing = train_set.replace(' ?', np.nan).dropna()
         test_no_missing = test_set.replace(' ?', np.nan).dropna()
-        train_no_missing.to_csv('adult_train_cleaned.csv')
-        test_no_missing.to_csv('adult_test_cleaned.csv')
-        response = s3_client.upload_file(f'adult_train_cleaned.csv', 'data', "data/{}".format('adult_train_cleaned.csv'))
+        train_no_missing.to_csv('income_train_cleaned.csv')
+        test_no_missing.to_csv('income_test_cleaned.csv')
+        response = s3_client.upload_file(f'income_train_cleaned.csv', 'data', "data/{}".format('income_train_cleaned.csv'))
         print("Uploaded cleaned data to S3")
-        response = s3_client.upload_file(f'adult_test_cleaned.csv', 'data', "data/{}".format('adult_test_cleaned.csv'))
+        response = s3_client.upload_file(f'income_test_cleaned.csv', 'data', "data/{}".format('income_test_cleaned.csv'))
         print("Uploaded cleaned test data to S3")
     # [END transform_function]
 
