@@ -83,7 +83,7 @@ with DAG(
         test_set.head()
         train_no_missing = train_set.replace(' ?', np.nan).dropna()
         test_no_missing = test_set.replace(' ?', np.nan).dropna()
-        test_no_missing['wage_class'] = test_no_missing.wage_class.replace({' <=50K.' : ' <=50K', ' >50K.' : ' >50K'})
+        test_no_missing['wage_class'] = test_no_missing['wage_class'].replace({' <=50K.' : ' <=50K', ' >50K.' : ' >50K'})
         combined_set = pd.concat([train_no_missing, test_no_missing], axis=0)
         group = combined_set.groupby('wage_class')
         cat_codes = {}
