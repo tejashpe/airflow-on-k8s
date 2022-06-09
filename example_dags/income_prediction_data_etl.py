@@ -83,8 +83,26 @@ with DAG(
         test_set.head()
         train_no_missing = train_set.replace(' ?', np.nan).dropna()
         test_no_missing = test_set.replace(' ?', np.nan).dropna()
-        train_no_missing.to_csv('income_train_cleaned.csv')
-        test_no_missing.to_csv('income_test_cleaned.csv')
+        test_no_missing['wage_class'] = test_no_missing.wage_class.replace({' <=50K.' : ' <=50K', ' >50K.' : ' >50K'})
+        combined_set = pd.concat([train_no_missing, test_no_missing], axis=0)
+        group = combined_set.groupby('wage_class')
+        cat_codes = {}
+        for feature in combined_set.columns: 
+            if combined_set[feature].dtype == 'object':
+                #workclass : { occupation : number }
+                temp_dict = {}
+                feature_codes = list(pd.Categorical(combined_set[feature]).codes)
+                feature_list = list(combined_set[feature])
+                for i in range(len(feature_codes)):
+                    temp_dict[feature_list[i].strip()] = int(feature_codes[i])
+                    if len(temp_dict) > len(feature_list):
+                        break
+                cat_codes[feature] = temp_dict
+                combined_set[feature] = pd.Categorical(combined_set[feature]).codes
+        final_train = combined_set[:train_no_missing.shape[0]] 
+        final_test = combined_set[train_no_missing.shape[0]:]   
+        final_train.to_csv('income_train_cleaned.csv')
+        final_test.to_csv('income_test_cleaned.csv')
         response = s3_client.upload_file(f'income_train_cleaned.csv', 'data', "data/{}".format('income_train_cleaned.csv'))
         print("Uploaded cleaned data to S3")
         response = s3_client.upload_file(f'income_test_cleaned.csv', 'data', "data/{}".format('income_test_cleaned.csv'))
