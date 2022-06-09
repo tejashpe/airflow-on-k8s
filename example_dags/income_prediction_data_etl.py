@@ -77,13 +77,18 @@ with DAG(
             aws_access_key_id= Variable.get('AWS_ACCESS_KEY_ID'), aws_secret_access_key=Variable.get('AWS_SECRET_ACCESS_KEY'), verify=False)
         s3_client.download_file('data', "data/{}".format('income_data.csv'), 'income_data.csv')
         s3_client.download_file('data', "data/{}".format('income_test.csv'), 'income_test.csv')
+        col_labels = ['age', 'workclass', 'fnlwgt', 'education', 'education_num', 'marital_status', 'occupation', 
+              'relationship', 'race', 'sex', 'capital_gain', 'capital_loss', 'hours_per_week', 'native_country',
+             'wage_class']
         train_set = pd.read_csv('income_data.csv', header=None)
         train_set.head()
         test_set = pd.read_csv('income_test.csv', skiprows=1, header=None)
         test_set.head()
+        train_set.columns = col_labels
+        test_set.columns = col_labels
         train_no_missing = train_set.replace(' ?', np.nan).dropna()
         test_no_missing = test_set.replace(' ?', np.nan).dropna()
-        test_no_missing['wage_class'] = test_no_missing['wage_class'].replace({' <=50K.' : ' <=50K', ' >50K.' : ' >50K'})
+        test_no_missing['wage_class'] = test_no_missing.wage_class.replace({' <=50K.' : ' <=50K', ' >50K.' : ' >50K'})
         combined_set = pd.concat([train_no_missing, test_no_missing], axis=0)
         group = combined_set.groupby('wage_class')
         cat_codes = {}
@@ -99,6 +104,8 @@ with DAG(
                         break
                 cat_codes[feature] = temp_dict
                 combined_set[feature] = pd.Categorical(combined_set[feature]).codes
+        with open('income_encoding.json', 'w') as file:
+            json.dump(cat_codes, file)
         final_train = combined_set[:train_no_missing.shape[0]] 
         final_test = combined_set[train_no_missing.shape[0]:]   
         final_train.to_csv('income_train_cleaned.csv')
@@ -106,6 +113,8 @@ with DAG(
         response = s3_client.upload_file(f'income_train_cleaned.csv', 'data', "data/{}".format('income_train_cleaned.csv'))
         print("Uploaded cleaned data to S3")
         response = s3_client.upload_file(f'income_test_cleaned.csv', 'data', "data/{}".format('income_test_cleaned.csv'))
+        print("Uploaded cleaned test data to S3")
+        response = s3_client.upload_file(f'income_encoding.csv', 'data', "data/{}".format('income_encoding.json'))
         print("Uploaded cleaned test data to S3")
     # [END transform_function]
 
