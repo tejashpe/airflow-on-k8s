@@ -114,7 +114,7 @@ with DAG(
         print("Uploaded cleaned data to S3")
         response = s3_client.upload_file(f'income_test_cleaned.csv', 'data', "data/{}".format('income_test_cleaned.csv'))
         print("Uploaded cleaned test data to S3")
-        response = s3_client.upload_file(f'income_encoding.csv', 'data', "data/{}".format('income_encoding.json'))
+        response = s3_client.upload_file(f'income_encoding.json', 'data', "data/{}".format('income_encoding.json'))
         print("Uploaded cleaned test data to S3")
     # [END transform_function]
 
